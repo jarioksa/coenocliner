@@ -28,6 +28,9 @@
 ##' @param py a list of named elements, each of which is a vector of numeric parameter values for the species response on the secondary gradient \code{y}. See Details for further information on the required parameters.
 ##' @param corr numeric; the correlation between gradients \code{x} and \code{y}. Only applies to \code{Gaussian()}.
 ##'
+##' @param logistic logical; use logistic response model instead of
+##' the standard one.
+##'
 ##' @return A numeric vector of species "abundances" of length equal to \code{length(x)}.
 ##'
 ##' @author Gavin L. Simpson
@@ -85,12 +88,22 @@
 ##'
 ##' spprc <- Beta(x, y, px = px, py = py)
 ##' persp(xx, yy, matrix(spprc, ncol = length(xx)))
-`Gaussian` <- function(x, y = NULL, px, py = NULL, corr = 0) {
+##' @importFrom stats plogis
+`Gaussian` <- function(x, y = NULL, px, py = NULL, corr = 0,
+                       logistic = FALSE) {
+    linkfun <- if(logistic)
+                   safeql
+               else
+                   log
+    invlink <- if(logistic)
+                   plogis
+               else
+                   exp
     sim <- if (is.null(y)) {
         .checkGaussianPar(px = px)
 
         ## Compute Gaussian response
-        px[["h"]] * exp(-((x - px[["opt"]])^2/(2 * px[["tol"]]^2)))
+        linkfun(px[["h"]]) - (x - px[["opt"]])^2/(2 * px[["tol"]]^2)
     } else {
         stopifnot(all.equal(length(x), length(y)))
 
@@ -100,10 +113,9 @@
         t1x <- (x - px[["opt"]]) / px[["tol"]]
         t1y <- (y - py[["opt"]]) / py[["tol"]]
 
-        px[["h"]] * exp(-(t1 * ((t1x^2 + t1y^2) -
-                                ((2 * corr) * t1x * t1y))))
+        linkfun(px[["h"]]) - t1 * (t1x^2 + t1y^2 - 2 * corr * t1x * t1y)
     }
-    sim
+    invlink(sim)
 }
 
 `.checkGaussianPar` <- function(px, py = NULL) {
@@ -249,3 +261,8 @@
 
     TRUE
 }
+### safe way of calling qlogis(1): users may give h=1 and that breaks
+### logistic models
+##' @importFrom stats qlogis
+`safeql` <- function(x) # qlogis(1) == Inf
+    qlogis(pmin(x, 1-.Machine$double.eps))

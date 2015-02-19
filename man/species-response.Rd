@@ -6,7 +6,7 @@
 \alias{species-response}
 \title{Species response models for coenocline simulation}
 \usage{
-Gaussian(x, y = NULL, px, py = NULL, corr = 0)
+Gaussian(x, y = NULL, px, py = NULL, corr = 0, logistic = FALSE)
 
 Beta(x, y = NULL, px, py = NULL)
 }
@@ -20,6 +20,9 @@ Beta(x, y = NULL, px, py = NULL)
 \item{py}{a list of named elements, each of which is a vector of numeric parameter values for the species response on the secondary gradient \code{y}. See Details for further information on the required parameters.}
 
 \item{corr}{numeric; the correlation between gradients \code{x} and \code{y}. Only applies to \code{Gaussian()}.}
+
+\item{logistic}{logical; use logistic response model instead of
+the standard one.}
 }
 \value{
 A numeric vector of species "abundances" of length equal to \code{length(x)}.
