@@ -155,9 +155,19 @@
     TRUE ## return
 }
 
+##' @importFrom stats plogis
 ##' @rdname species-response
 ##' @export
-`Beta` <- function(x, y = NULL, px, py = NULL) {
+`Beta` <- function(x, y = NULL, px, py = NULL, logistic = FALSE) {
+    linkfun <- if(logistic)
+                   safeql
+               else
+                   log
+    invlink <- if(logistic)
+                   plogis
+               else
+                   exp
+
     ## This implements eqn (5) in Minchin 1987 for the part to the right
     ## of the product symmbol, call this for each of gradients x and y
     ## returns 0 if x is outside range of spp on gradient
@@ -167,8 +177,8 @@
         upr <- m + (r * (1 - b))
         xmr <- (x - m) / r
         ifelse(x >= lwr & x <= upr,
-               (xmr + b)^alpha * (1 - (xmr + b))^gamma, ## TRUE
-               0 ## FALSE, outside r of species so 0
+               log(xmr + b)*alpha + log(1 - (xmr + b))*gamma, ## TRUE
+               -Inf ## FALSE, outside r of species so linkinv() == 0
                )
     }
 
@@ -186,8 +196,7 @@
         g <- gradfun(x, px[["m"]], px[["r"]], px[["alpha"]], px[["gamma"]], b)
 
         ## finally Eqn 5 in Minchin 1987
-        A <- (px[["A0"]] / d) * g
-        A
+        linkfun(px[["A0"]] / d) + g
     } else {
         stopifnot(all.equal(length(x), length(y)))
 
@@ -209,10 +218,9 @@
         gy <- gradfun(y, py[["m"]], py[["r"]], py[["alpha"]], py[["gamma"]], by)
 
         ## finally Eqn 5 in Minchin 1987
-        A <- (px[["A0"]] / d) * (gx * gy)
-        A
+        linkfun(px[["A0"]] / d) + gx + gy
     }
-    sim
+    invlink(sim)
 }
 
 `.checkBetaPar` <- function(px, py = NULL) {

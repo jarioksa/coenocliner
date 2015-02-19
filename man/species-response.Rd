@@ -8,7 +8,7 @@
 \usage{
 Gaussian(x, y = NULL, px, py = NULL, corr = 0, logistic = FALSE)
 
-Beta(x, y = NULL, px, py = NULL)
+Beta(x, y = NULL, px, py = NULL, logistic = FALSE)
 }
 \arguments{
 \item{x}{numeric; locations of observations on the primary gradient.}
