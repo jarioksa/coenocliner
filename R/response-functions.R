@@ -189,14 +189,14 @@
 
         ## some derived parameters, eqns 3 and 4 from Minchin 1987
         b <- px[["alpha"]] / (px[["alpha"]] + px[["gamma"]])
-        d <- invlink(log(b)*px[["alpha"]] + log(1 - b)*px[["gamma"]])
+        d <- log(b)*px[["alpha"]] + log(1 - b)*px[["gamma"]]
 
         ## Using gradfun() compute the part of eqn to the right of the Pi for
         ## gradient x...
         g <- gradfun(x, px[["m"]], px[["r"]], px[["alpha"]], px[["gamma"]], b)
 
         ## finally Eqn 5 in Minchin 1987
-        px[["A0"]]/d * invlink(g)
+        linkfun(px[["A0"]]) + g - d
     } else {
         stopifnot(all.equal(length(x), length(y)))
 
@@ -210,7 +210,6 @@
         ## constant d Eqn 7 in Minchin 1987
         d <- log(bx)*px[["alpha"]] + log(1 - bx)*px[["gamma"]] +
             log(by)*py[["alpha"]] + log(1 - by)*py[["gamma"]]
-        d <- invlink(d)
 
         ## Using gradfun() compute the part of eqn to the right of the Pi for
         ## gradient x...
@@ -219,9 +218,9 @@
         gy <- gradfun(y, py[["m"]], py[["r"]], py[["alpha"]], py[["gamma"]], by)
 
         ## finally Eqn 5 in Minchin 1987
-        px[["A0"]] / d * invlink(gx + gy)
+        linkfun(px[["A0"]]) - d  + gx + gy
     }
-    sim
+    invlink(sim)
 }
 
 `.checkBetaPar` <- function(px, py = NULL) {
