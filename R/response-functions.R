@@ -176,10 +176,11 @@
         lwr <- m - (r * b)
         upr <- m + (r * (1 - b))
         xmr <- (x - m) / r
-        ifelse(x >= lwr & x <= upr,
-               log(xmr + b)*alpha + log(1 - (xmr + b))*gamma, ## TRUE
-               -Inf ## FALSE, outside r of species so linkinv() == 0
-               )
+        out <- rep(-Inf, length(x))
+        k <- x >= lwr & x <= upr
+        out[k] <- log(xmr[k] + b[k])*alpha[k] +
+            log(1 - (xmr[k] + b[k]))* gamma[k]
+        out
     }
 
     sim <- if (is.null(y)) {
