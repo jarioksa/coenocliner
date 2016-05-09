@@ -21,9 +21,7 @@
 ##'
 ##' @importFrom stats rpois rgamma
 `NegBin` <- function(n, mu, alpha) {
-    if (alpha < 0L) {
-        stop("Negative values of 'alpha' are not supported")
-    }
+    alpha <- pmax(alpha, .Machine$double.eps)
     if (!isTRUE(all.equal(alpha, 0L))) {
         mu <- mu * rgamma(n, shape = 1/alpha, rate = 1/alpha)
     }
@@ -79,9 +77,7 @@
 ##'
 ##' @importFrom stats rpois rgamma runif
 `ZINB` <- function(n, mu, alpha, zprobs) {
-    if (alpha < 0L) {
-        stop("Negative values of 'alpha' are not supported")
-    }
+    alpha <- pmax(alpha, .Machine$double.eps)
     if (!isTRUE(all.equal(alpha, 0L))) {
         mu <- mu * rgamma(n, shape = 1/alpha, rate = 1/alpha)
     }
