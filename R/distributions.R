@@ -22,9 +22,7 @@
 ##' @importFrom stats rpois rgamma
 `NegBin` <- function(n, mu, alpha) {
     alpha <- pmax(alpha, .Machine$double.eps)
-    if (!isTRUE(all.equal(alpha, 0L))) {
-        mu <- mu * rgamma(n, shape = 1/alpha, rate = 1/alpha)
-    }
+    mu <- mu * rgamma(n, shape = 1/alpha, rate = 1/alpha)
     rpois(n, lambda = mu)
 }
 
@@ -78,9 +76,7 @@
 ##' @importFrom stats rpois rgamma runif
 `ZINB` <- function(n, mu, alpha, zprobs) {
     alpha <- pmax(alpha, .Machine$double.eps)
-    if (!isTRUE(all.equal(alpha, 0L))) {
-        mu <- mu * rgamma(n, shape = 1/alpha, rate = 1/alpha)
-    }
+    mu <- mu * rgamma(n, shape = 1/alpha, rate = 1/alpha)
     ifelse(runif(n) > zprobs,
            rpois(n, lambda = mu),
            0)
