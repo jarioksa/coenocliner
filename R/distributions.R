@@ -21,12 +21,11 @@
 ##'
 ##' @importFrom stats rpois rgamma
 `NegBin` <- function(n, mu, alpha) {
-    if (alpha < 0L) {
-        stop("Negative values of 'alpha' are not supported")
-    }
-    if (!isTRUE(all.equal(alpha, 0L))) {
-        mu <- mu * rgamma(n, shape = 1/alpha, rate = 1/alpha)
-    }
+    mu <- rep(mu, length.out = n)
+    alpha <- rep(alpha, length.out = n)
+    mu <- ifelse(alpha > 0,
+                 mu * rgamma(n, shape = 1/alpha, rate = 1/alpha),
+                 mu)
     rpois(n, lambda = mu)
 }
 
@@ -79,12 +78,11 @@
 ##'
 ##' @importFrom stats rpois rgamma runif
 `ZINB` <- function(n, mu, alpha, zprobs) {
-    if (alpha < 0L) {
-        stop("Negative values of 'alpha' are not supported")
-    }
-    if (!isTRUE(all.equal(alpha, 0L))) {
-        mu <- mu * rgamma(n, shape = 1/alpha, rate = 1/alpha)
-    }
+    mu <- rep(mu, length.out = n)
+    alpha <- rep(alpha, length.out = n)
+    ifelse(alpha > 0,
+           mu <- mu * rgamma(n, shape = 1/alpha, rate = 1/alpha),
+           mu)
     ifelse(runif(n) > zprobs,
            rpois(n, lambda = mu),
            0)
